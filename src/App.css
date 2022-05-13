@@ -36,3 +36,64 @@
     transform: rotate(360deg);
   }
 }
+
+body {
+  background-color: #1c1818;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  
+/*   border-style: solid;
+  border-width: 2px;
+  border-color: green; */
+  height: 100vh;
+}
+
+.list {
+  color: darkgray;
+}
+
+.objectBracket {
+  color: darkgray
+}
+.objectEntry {
+  padding-left: 20px;
+  color: #99c1f1;
+}
+
+.listEntry {
+  padding-left: 20px;
+}
+
+.string {
+  color: #62a0ea;
+}
+
+.null {
+  color: lightgray;
+}
+
+.boolean {
+  color: #ffbe6f;
+}
+
+.num {
+  color: #cc6060;
+}
+
+.selected {
+  animation: blinking_selected 1.2s infinite;
+}
+
+@keyframes blinking_selected {
+  0%, 40% {
+    background-color: #3d3846
+  }
+  41%, 100% {
+background-color: black;
+  }
+}

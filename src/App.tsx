@@ -49,7 +49,7 @@ function optionallySelectedClassName(className: string, selected: boolean) {
 
 function render(data: Json, path: JsonPath[] = []): ReactElement {
   const pathHead = path[0];
-  const scalarSelected = pathHead?.type == "JsonScalarLocation";
+  const scalarSelected = pathHead?.type === "JsonScalarLocation";
 
   if (data == null) {
     return (<span className={optionallySelectedClassName("null", scalarSelected)}>null</span>);
@@ -128,10 +128,10 @@ function basePath(data: Json): JsonPath[] {
   }
 }
 
-function down(data: Json, path: JsonPath[]): null | JsonPath[] {
+function down(data: Json, path: JsonPath[]): JsonPath[] {
 
   if (path.length == 0)
-    return null;
+    return path;
 
   const lait = path.slice(0, path.length - 1);
 
@@ -146,22 +146,22 @@ function down(data: Json, path: JsonPath[]): null | JsonPath[] {
         .concat([{ "type": "JsonObjectLocation", "position": end.position + 1 }])
       return subpath.concat(basePath(fetch(data, subpath)))
     } else {
-      return down(path.slice(0, path.length - 1));
+      return down(data, path.slice(0, path.length - 1));
     }
   } else if (end.type == "JsonArrayPos") {
     const list = fetch(data, lait);
 
-    if (list.length > end.position) {
-      console.log("Here")
-      const subpath = path.slice(0, path.length - 1)
-        .concat([{ "type": "JsonArrayPos", "position": end.position + 1 }])
-      console.log(subpath)
-      console.log(fetch(data, subpath))
-      return subpath.concat(basePath(fetch(data, subpath)))
-    } else {
-      return down(path.slice(0, path.length - 1));
-    }
-
+    // if (list.length > end.position) {
+    //   console.log("Here")
+    //   const subpath = path.slice(0, path.length - 1)
+    //     .concat([{ "type": "JsonArrayPos", "position": end.position + 1 }])
+    //   console.log(subpath)
+    //   console.log(fetch(data, subpath))
+    //   return subpath.concat(basePath(fetch(data, subpath)))
+    // } else {
+    //   return down(json, path.slice(0, path.length - 1));
+    // }
+      return [];
   }
 
   return [];
@@ -176,11 +176,12 @@ export default function App() {
     "listy": [1, 2, 3, [4, 5, 6]],
     "associate": { "bad_num": 10.3 }
   };
-  let path = [{ "type": "JsonObjectLocation", "position": 0 },
+  let path : JsonPath[] = [{ "type": "JsonObjectLocation", "position": 0 },
   { "type": "JsonScalarLocation" }];
 
-  for (let i = 0; i < 4; i++) {
-    path = down(current, path);
+  for (let i = 0; i < 0; i++) {
+    let foo = down(current, path);
+    path = foo;
   }
   console.log(path);
   return (

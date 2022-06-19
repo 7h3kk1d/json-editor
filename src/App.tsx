@@ -46,9 +46,12 @@ function render(data: Json, path: JsonPath[] = []): ReactElement {
     const pairs = Object.entries(data);
     const last = pairs[pairs.length - 1];
     const elems = pairs
-      .map(([k, v], idx) => (<div className="objectEntry">"{k}": {render(v, pathPosition == idx ? pathTail : [])}{idx == (pairs.length - 1) ? "" : ","}</div>))
+      .map(([k, v], idx) => {
+        const selected = pathPosition == idx && pathTail.length == 0 ? "selected" : ""
+        return (<div className={`objectEntry ${selected}`}>"{k}": {render(v, pathPosition == idx ? pathTail : [])}{idx == (pairs.length - 1) ? "" : ","}</div>)
+      })
 
-    return (<span className="object">
+    return (<span className={`object`}>
       <span className="objectBracket">&#123;</span>
       {elems}
       <span className="objectBracket">&#125;</span>
@@ -60,6 +63,23 @@ function render(data: Json, path: JsonPath[] = []): ReactElement {
 }
 
 
+class JsonEditor extends React.Component<{jsonData: Json, jsonPath: JsonPath[]}, {jsonData: Json, jsonPath: JsonPath[]}> {
+  constructor(props: {jsonData: Json, jsonPath: JsonPath[]}) {
+    super(props);
+    this.state = {jsonData: props.jsonData, jsonPath: props.jsonPath};
+    this.handleKey = this.handleKey.bind(this);
+  }
+
+  handleKey() { 
+    console.log("Path" + JSON.stringify(this.state.jsonPath))
+    this.setState(prevState => ({jsonData: prevState.jsonData, jsonPath: down(prevState.jsonData, prevState.jsonPath)}));  
+  }
+
+  render() {
+    return <div onKeyDown={this.handleKey} tabIndex={0}>{render(this.state.jsonData, this.state.jsonPath)}</div>
+  }
+}
+
 
 export default function App() {
   const current: Json = {
@@ -70,17 +90,16 @@ export default function App() {
     "listy": [1, 2, 3, [4, 5, 6]],
     "associate": { "bad_num": 10.3 }
   };
-  let path : JsonPath[] = [{ "type": "JsonObjectLocation", "position": 0 , "focus" : "key"},
-  { "type": "JsonScalarLocation" }];
+  let path : JsonPath[] = [{ "type": "JsonObjectLocation", "position": 0 , "focus" : "key"}];
 
   for (let i = 0; i < 0; i++) {
     let foo = down(current, path);
     path = foo;
   }
-  console.log(path);
+
   return (
     <main>
-      {render(current, path)}
+      <JsonEditor jsonData={current} jsonPath={path} />
     </main>
   )
 }

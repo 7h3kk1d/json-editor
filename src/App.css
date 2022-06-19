@@ -61,12 +61,12 @@ main {
   color: darkgray
 }
 .objectEntry {
-  padding-left: 20px;
+  margin-left: 20px;
   color: #99c1f1;
 }
 
 .listEntry {
-  padding-left: 20px;
+  margin-left: 20px;
 }
 
 .string {

@@ -60,4 +60,31 @@ function down(data: Json, path: JsonPath[]): JsonPath[] {
   return path
 }
 
-export { down, fetch };
+function up(data: Json, path: JsonPath[]): JsonPath[] {
+  if (path.length < 1)
+    return []
+  if (data == null)
+    return path
+
+  const head: JsonPath = path[0]
+  const tail: JsonPath[] = path.slice(1, path.length)
+
+  if (head["type"] == "JsonArrayPos" && Array.isArray(data)) {
+    if (head.position > 0) {
+      const foo: JsonPath[] = [arrayPath(head.position - 1)]
+      return foo.concat(tail)
+    } else {
+      return path
+    }
+  } else if (head["type"] == "JsonObjectLocation" && typeof (data) === 'object') {
+    if (head.position > 0) {
+      const foo: JsonPath[] = [objectPath(head.position - 1, head.focus)]
+      return foo.concat(tail)
+    } else {
+      return path
+    }
+  }
+  return path
+}
+
+export { down, fetch, up };

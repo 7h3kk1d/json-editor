@@ -2,7 +2,7 @@ import * as React from 'react'
 import { ReactElement } from 'react'
 import './App.css'
 import { Json, JsonPath } from './domain';
-import { down } from './navigation';
+import { down, up } from './navigation';
 
 function optionallySelectedClassName(className: string, selected: boolean) {
   return className + (selected ? " selected" : "")
@@ -70,9 +70,13 @@ class JsonEditor extends React.Component<{jsonData: Json, jsonPath: JsonPath[]},
     this.handleKey = this.handleKey.bind(this);
   }
 
-  handleKey() { 
+  handleKey(event: React.KeyboardEvent<HTMLDivElement>) { 
+    console.log(event.key)
     console.log("Path" + JSON.stringify(this.state.jsonPath))
-    this.setState(prevState => ({jsonData: prevState.jsonData, jsonPath: down(prevState.jsonData, prevState.jsonPath)}));  
+    if(event.key=="ArrowDown")
+      this.setState(prevState => ({jsonData: prevState.jsonData, jsonPath: down(prevState.jsonData, prevState.jsonPath)})); 
+    else if(event.key=="ArrowUp")
+      this.setState(prevState => ({jsonData: prevState.jsonData, jsonPath: up(prevState.jsonData, prevState.jsonPath)})); 
   }
 
   render() {
@@ -82,15 +86,15 @@ class JsonEditor extends React.Component<{jsonData: Json, jsonPath: JsonPath[]},
 
 
 export default function App() {
-  const current: Json = {
+  const current: Json = [1,2,"Hello","World", true, false, null, {
     "Hello": "World",
     "empty": null,
     "truthy": true,
     "falsey": false,
     "listy": [1, 2, 3, [4, 5, 6]],
     "associate": { "bad_num": 10.3 }
-  };
-  let path : JsonPath[] = [{ "type": "JsonObjectLocation", "position": 0 , "focus" : "key"}];
+  }];
+  let path : JsonPath[] = [{"type": "JsonArrayPos", position: 0}, {"type": "JsonScalarLocation"}];
 
   for (let i = 0; i < 0; i++) {
     let foo = down(current, path);

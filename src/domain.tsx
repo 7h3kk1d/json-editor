@@ -7,7 +7,8 @@ type Json = number | string | boolean | null | { [key: string]: Json } | Json[]
 */
 type JsonArrayPos = {
   type: "JsonArrayPos",
-  position: number
+  position: number,
+  inner?: JsonPath
 }
 
 // TODO: Key path
@@ -15,32 +16,27 @@ type JsonObjectLocation = {
   type: "JsonObjectLocation",
   position: number,
   focus: "key" | "value"
+  inner?: JsonPath
 }
-type JsonScalarLocation = {
-  type: "JsonScalarLocation"
-}
-type JsonPath = JsonArrayPos | JsonObjectLocation | JsonScalarLocation
 
-function arrayPath(n : number) : JsonArrayPos {
+type JsonPath = JsonArrayPos | JsonObjectLocation
+
+
+function arrayPath(n : number, inner?: JsonPath) : JsonArrayPos {
     return {
         type: "JsonArrayPos",
-        position: n
+        position: n,
+        inner: inner
       }
 }
 
-function objectPath(n: number, focus: "key" | "value") : JsonObjectLocation {
+function objectPath(n: number, focus: "key" | "value"="key") : JsonObjectLocation {
     return {
         type: "JsonObjectLocation",
         position: n,
-        focus: focus
-    }
+        focus: "key"
+          }
 }
 
-function scalarPath() : JsonScalarLocation {
-    return {
-        type: "JsonScalarLocation"
-    }
-}
-
-export type {Json, JsonArrayPos, JsonObjectLocation, JsonScalarLocation, JsonPath}
-export {scalarPath, objectPath, arrayPath}
+export type {Json, JsonArrayPos, JsonObjectLocation, JsonPath}
+export {objectPath, arrayPath}

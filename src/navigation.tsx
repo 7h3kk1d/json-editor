@@ -1,5 +1,6 @@
 
-import { arrayPath, Json, JsonPath, objectPath } from "./domain";
+import { json } from "stream/consumers";
+import { arrayPath, Json, JsonArrayPos, JsonPath, objectPath } from "./domain";
 // Explore different type of tree walks/navigation operations
 
 function fetch(data: Json, path: JsonPath[]): Json | null {
@@ -19,72 +20,72 @@ function fetch(data: Json, path: JsonPath[]): Json | null {
 }
 
 function basePath(data: Json): JsonPath[] {
-  if (data == null) {
-    return [{ "type": "JsonScalarLocation" }];
-  } else if (Array.isArray(data)) {
+  if (Array.isArray(data)) {
     const head: JsonPath[] = [{ "type": "JsonArrayPos", "position": 0 }];
     const tail: JsonPath[] = basePath(data[0]);
     return head.concat(tail);
   } else if (typeof (data) == "object") {
     return [{ "type": "JsonObjectLocation", "position": 0, "focus": "key" }]
   } else {
-    return [{ "type": "JsonScalarLocation" }]
+    return []
   }
 }
 
 // TODO: Can I use conditional types to enforce that path and data are coherent
-function down(data: Json, path: JsonPath[]): JsonPath[] {
-  if (path.length < 1)
-    return []
-  if (data == null)
-    return path
-
-  const head: JsonPath = path[0]
-  const tail: JsonPath[] = path.slice(1, path.length)
-
-  if (head["type"] == "JsonArrayPos" && Array.isArray(data)) {
-    if (head.position < (data.length - 1)) {
-      const foo: JsonPath[] = [arrayPath(head.position + 1)]
-      return foo.concat(tail)
-    } else {
-      return path
-    }
-  } else if (head["type"] == "JsonObjectLocation" && typeof (data) === 'object') {
-    if (head.position < (Object.keys(data).length - 1)) {
-      const foo: JsonPath[] = [objectPath(head.position + 1, head.focus)]
-      return foo.concat(tail)
-    } else {
-      return path
-    }
+function down(data: Json, path: JsonPath): JsonPath | null {
+  switch (path.type) {
+    case "JsonArrayPos":
+      const data2 = data as Json[]
+      if (!path.inner) {
+        if (data2.length >= path.position) {
+          return arrayPath(path.position + 1)
+        } else {
+          return null;
+        }
+      }
+      else {
+        return arrayPath(path.position, path.inner) // Incomplete
+      }
+    case "JsonObjectLocation":
+      const objectData = data as { [key: string]: Json }
+      if (!path.inner) {
+        if (Object.entries(objectData).length >= path.position) {
+          return objectPath(path.position + 1)
+        } else {
+          return null;
+        }
+      }
+      else {
+        return path// Incomplete
+      }
   }
-  return path
 }
 
-function up(data: Json, path: JsonPath[]): JsonPath[] {
-  if (path.length < 1)
-    return []
-  if (data == null)
-    return path
-
-  const head: JsonPath = path[0]
-  const tail: JsonPath[] = path.slice(1, path.length)
-
-  if (head["type"] == "JsonArrayPos" && Array.isArray(data)) {
-    if (head.position > 0) {
-      const foo: JsonPath[] = [arrayPath(head.position - 1)]
-      return foo.concat(tail)
-    } else {
-      return path
-    }
-  } else if (head["type"] == "JsonObjectLocation" && typeof (data) === 'object') {
-    if (head.position > 0) {
-      const foo: JsonPath[] = [objectPath(head.position - 1, head.focus)]
-      return foo.concat(tail)
-    } else {
-      return path
-    }
+function up(data: Json, path: JsonPath): JsonPath | null {
+  switch (path.type) {
+    case "JsonArrayPos":
+      if (!path.inner) {
+        if (path.position > 0) {
+          return arrayPath(path.position - 1)
+        } else {
+          return null;
+        }
+      }
+      else {
+        return arrayPath(path.position, path.inner) // Incomplete
+      }
+      case "JsonObjectLocation":
+        if (!path.inner) {
+          if (path.position > 0) {
+            return objectPath(path.position - 1)
+          } else {
+            return null;
+          }
+        }
+        else {
+          return path// Incomplete
+        }  
   }
-  return path
 }
 
 export { down, fetch, up };

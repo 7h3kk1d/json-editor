@@ -87,6 +87,7 @@ main {
 
 .selected {
   animation: blinking_selected 1.2s infinite;
+  width: fit-content;
 }
 
 @keyframes blinking_selected {

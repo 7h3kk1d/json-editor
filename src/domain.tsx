@@ -4,6 +4,8 @@ type Json = number | string | boolean | null | { [key: string]: Json } | Json[]
 /* Alternative Approaches:
     Some form of CoFree on Json so I don't have to specify this at all
     Recursive path implementation where the carrier types contain the rest of the path
+
+    Lenses are probably a better approach
 */
 type JsonArrayPos = {
   type: "JsonArrayPos",

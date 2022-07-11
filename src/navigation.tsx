@@ -37,7 +37,7 @@ function down(data: Json, path: JsonPath): JsonPath | null {
     case "JsonArrayPos":
       const data2 = data as Json[]
       if (!path.inner) {
-        if (data2.length >= path.position) {
+        if (data2.length > (path.position+1)) {
           return arrayPath(path.position + 1)
         } else {
           return null;
@@ -49,7 +49,7 @@ function down(data: Json, path: JsonPath): JsonPath | null {
     case "JsonObjectLocation":
       const objectData = data as { [key: string]: Json }
       if (!path.inner) {
-        if (Object.entries(objectData).length >= path.position) {
+        if (Object.entries(objectData).length > (path.position+1)) {
           return objectPath(path.position + 1)
         } else {
           return null;

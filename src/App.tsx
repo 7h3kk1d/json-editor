@@ -69,7 +69,7 @@ class JsonEditor extends React.Component<{jsonData: Json, jsonPath: JsonPath}, {
     this.handleKey = this.handleKey.bind(this);
   }
 
-  handleKey(event: React.KeyboardEvent<HTMLDivElement>) {
+  handleKey(event: KeyboardEvent) {
     if(event.key=="ArrowDown")
       this.setState(prevState => ({jsonData: prevState.jsonData, jsonPath: down(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath})); 
     else if(event.key=="ArrowUp")
@@ -88,8 +88,12 @@ class JsonEditor extends React.Component<{jsonData: Json, jsonPath: JsonPath}, {
       this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, ""), jsonPath: prevState.jsonPath}))
   }
 
+  componentDidMount() {
+    document.addEventListener("keydown", this.handleKey)
+  }
+
   render() {
-    return <div onKeyDown={this.handleKey} tabIndex={0}>{render(this.state.jsonData, this.state.jsonPath)}</div>
+    return <div tabIndex={0}>{render(this.state.jsonData, this.state.jsonPath)}</div>
   }
 }
 

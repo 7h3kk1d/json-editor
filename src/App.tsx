@@ -50,12 +50,12 @@ function render(data: Json, path?: JsonPath, selected: boolean=false): ReactElem
         return (<div className={optionallySelectedClassName("objectEntry", pathPosition === idx && inner === undefined)}>"{k}": {render(v, pathPosition === idx ? inner : undefined, false)}{idx == (pairs.length - 1) ? "" : ","}</div>)
       })
 
-    return (<div className={optionallySelectedClassName("object", selected)}>
+    return (<span className={optionallySelectedClassName("object", selected)}>
       <span className="objectBracket">&#123;</span>
       {elems}
       <span className="objectBracket">&#125;</span>
 
-    </div>);
+    </span>);
   } else {
     return (<></>);
   }
@@ -69,13 +69,23 @@ class JsonEditor extends React.Component<{jsonData: Json, jsonPath: JsonPath}, {
     this.handleKey = this.handleKey.bind(this);
   }
 
-  handleKey(event: React.KeyboardEvent<HTMLDivElement>) { 
+  handleKey(event: React.KeyboardEvent<HTMLDivElement>) {
     if(event.key=="ArrowDown")
       this.setState(prevState => ({jsonData: prevState.jsonData, jsonPath: down(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath})); 
     else if(event.key=="ArrowUp")
       this.setState(prevState => ({jsonData: prevState.jsonData, jsonPath: up(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath}));
     else if (event.key=="n")
       this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, null), jsonPath: prevState.jsonPath}))
+    else if (event.key=="t")
+      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, true), jsonPath: prevState.jsonPath}))
+    else if (event.key=="f")
+      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, false), jsonPath: prevState.jsonPath}))
+    else if (event.key=="{")
+      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, {}), jsonPath: prevState.jsonPath}))
+    else if (event.key=="[")
+      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, []), jsonPath: prevState.jsonPath}))
+      else if (event.key=="\"")
+      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, ""), jsonPath: prevState.jsonPath}))
   }
 
   render() {

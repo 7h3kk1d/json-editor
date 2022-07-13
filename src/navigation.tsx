@@ -1,33 +1,20 @@
 
-import { json } from "stream/consumers";
-import { arrayPath, Json, JsonArrayPos, JsonPath, objectPath } from "./domain";
+import { arrayPath, Json, JsonPath, objectPath } from "./domain";
 // Explore different type of tree walks/navigation operations
 
 function fetch(data: Json, path: JsonPath[]): Json | null {
-  if (path.length == 0)
+  if (path.length === 0)
     return data;
 
   const head: JsonPath = path[0];
-  if (head.type == "JsonArrayPos") {
+  if (head.type === "JsonArrayPos") {
     const array: Json[] = data as any;
     return fetch(array[head.position], path.slice(1, path.length));
-  } else if (head.type == "JsonObjectLocation") {
+  } else if (head.type === "JsonObjectLocation") {
     const obj: { [key: string]: Json } = data as any;
     return fetch(Object.entries(obj)[head.position][1], path.slice(1, path.length));
   } else {
     return data;
-  }
-}
-
-function basePath(data: Json): JsonPath[] {
-  if (Array.isArray(data)) {
-    const head: JsonPath[] = [{ "type": "JsonArrayPos", "position": 0 }];
-    const tail: JsonPath[] = basePath(data[0]);
-    return head.concat(tail);
-  } else if (typeof (data) == "object") {
-    return [{ "type": "JsonObjectLocation", "position": 0, "focus": "key" }]
-  } else {
-    return []
   }
 }
 

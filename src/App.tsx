@@ -9,7 +9,7 @@ function optionallySelectedClassName(className: string, selected: boolean) {
   return className + (selected ? " selected" : "")
 }
 
-function render(data: Json, path?: JsonPath, selected: boolean=false): ReactElement {
+function render(data: Json, path?: JsonPath, selected: boolean = false): ReactElement {
   console.log(JSON.stringify(path))
   const pathHead = path;
   if (data == null) {
@@ -27,9 +27,9 @@ function render(data: Json, path?: JsonPath, selected: boolean=false): ReactElem
 
     const elems = data
       .map((v, idx) => render(v, pathPosition === idx ? inner : undefined, false))
-      .map((v, idx) => idx === (data.length-1) ? v : <>{v},</>)
+      .map((v, idx) => idx === (data.length - 1) ? v : <>{v},</>)
       .map((v, idx) => <div className={optionallySelectedClassName("listEntry", pathPosition === idx && inner === undefined)}>{v}</div>)
-      // I kind of wish we could select just the element text and not the comma with the whole list entry
+    // I kind of wish we could select just the element text and not the comma with the whole list entry
 
     return (
       <span className={optionallySelectedClassName("list", selected)}>
@@ -39,7 +39,7 @@ function render(data: Json, path?: JsonPath, selected: boolean=false): ReactElem
       </span>
     );
   } else if (typeof (data) === 'object') {
-    const pathPosition = pathHead?.type == "JsonObjectLocation" ? pathHead.position : null;
+    const pathPosition = pathHead?.type === "JsonObjectLocation" ? pathHead.position : null;
     const objectPath = path as JsonObjectLocation | undefined
 
     const pairs = Object.entries(data);
@@ -47,7 +47,7 @@ function render(data: Json, path?: JsonPath, selected: boolean=false): ReactElem
 
     const elems = pairs
       .map(([k, v], idx) => {
-        return (<div className={optionallySelectedClassName("objectEntry", pathPosition === idx && inner === undefined)}>"{k}": {render(v, pathPosition === idx ? inner : undefined, false)}{idx == (pairs.length - 1) ? "" : ","}</div>)
+        return (<div className={optionallySelectedClassName("objectEntry", pathPosition === idx && inner === undefined)}>"{k}": {render(v, pathPosition === idx ? inner : undefined, false)}{idx === (pairs.length - 1) ? "" : ","}</div>)
       })
 
     return (<span className={optionallySelectedClassName("object", selected)}>
@@ -62,30 +62,30 @@ function render(data: Json, path?: JsonPath, selected: boolean=false): ReactElem
 }
 
 
-class JsonEditor extends React.Component<{jsonData: Json, jsonPath: JsonPath}, {jsonData: Json, jsonPath: JsonPath}> {
-  constructor(props: {jsonData: Json, jsonPath: JsonPath}) {
+class JsonEditor extends React.Component<{ jsonData: Json, jsonPath: JsonPath }, { jsonData: Json, jsonPath: JsonPath }> {
+  constructor(props: { jsonData: Json, jsonPath: JsonPath }) {
     super(props);
-    this.state = {jsonData: props.jsonData, jsonPath: props.jsonPath};
+    this.state = { jsonData: props.jsonData, jsonPath: props.jsonPath };
     this.handleKey = this.handleKey.bind(this);
   }
 
   handleKey(event: KeyboardEvent) {
-    if(event.key=="ArrowDown")
-      this.setState(prevState => ({jsonData: prevState.jsonData, jsonPath: down(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath})); 
-    else if(event.key=="ArrowUp")
-      this.setState(prevState => ({jsonData: prevState.jsonData, jsonPath: up(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath}));
-    else if (event.key=="n")
-      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, null), jsonPath: prevState.jsonPath}))
-    else if (event.key=="t")
-      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, true), jsonPath: prevState.jsonPath}))
-    else if (event.key=="f")
-      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, false), jsonPath: prevState.jsonPath}))
-    else if (event.key=="{")
-      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, {}), jsonPath: prevState.jsonPath}))
-    else if (event.key=="[")
-      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, []), jsonPath: prevState.jsonPath}))
-      else if (event.key=="\"")
-      this.setState(prevState => ({jsonData: replace(prevState.jsonData, prevState.jsonPath, ""), jsonPath: prevState.jsonPath}))
+    if (event.key === "ArrowDown")
+      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: down(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+    else if (event.key === "ArrowUp")
+      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: up(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+    else if (event.key === "n")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, null), jsonPath: prevState.jsonPath }))
+    else if (event.key === "t")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, true), jsonPath: prevState.jsonPath }))
+    else if (event.key === "f")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, false), jsonPath: prevState.jsonPath }))
+    else if (event.key === "{")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, {}), jsonPath: prevState.jsonPath }))
+    else if (event.key === "[")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, []), jsonPath: prevState.jsonPath }))
+    else if (event.key === "\"")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, ""), jsonPath: prevState.jsonPath }))
   }
 
   componentDidMount() {
@@ -107,7 +107,7 @@ export default function App() {
     "listy": [1, 2, 3, [4, 5, 6]],
     "associate": { "bad_num": 10.3 }
   };
-  let path : JsonObjectLocation = objectPath(0);
+  let path: JsonObjectLocation = objectPath(0);
 
 
   return (

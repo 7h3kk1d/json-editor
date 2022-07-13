@@ -36,6 +36,7 @@ jobs:
           
       - name: Deploy
         run: |
+              npm build
               git remote set-url origin https://git:7h3kk1d@github.com/json-editor.git
               npx gh-pages -d build -u "github-actions-bot <support+actions@github.com>"
         env:

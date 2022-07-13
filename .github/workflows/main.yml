@@ -1,6 +1,0 @@
-- name: Deploy with gh-pages
-  run: |
-    git remote set-url origin https://git:7h3kk1d@github.com/json-editor.git
-    npx gh-pages -d build -u "github-actions-bot <support+actions@github.com>"
-   env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }

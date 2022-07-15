@@ -32,11 +32,12 @@ function arrayPath(n : number, inner?: JsonPath) : JsonArrayPos {
       }
 }
 
-function objectPath(n: number, focus: "key" | "value"="key") : JsonObjectLocation {
+function objectPath(n: number, inner?: JsonPath) : JsonObjectLocation {
     return {
         type: "JsonObjectLocation",
         position: n,
-        focus: "key"
+        focus: "key",
+        inner: inner
           }
 }
 

@@ -3,14 +3,13 @@ import { ReactElement } from 'react'
 import './App.css'
 import { Json, JsonArrayPos, JsonObjectLocation, JsonPath, objectPath } from './domain';
 import { replace } from './modification';
-import { down, up } from './navigation';
+import { down, enter, leave, up } from './navigation';
 
 function optionallySelectedClassName(className: string, selected: boolean) {
   return className + (selected ? " selected" : "")
 }
 
 function render(data: Json, path?: JsonPath, selected: boolean = false): ReactElement {
-  console.log(JSON.stringify(path))
   const pathHead = path;
   if (data == null) {
     return (<span className={optionallySelectedClassName("null", selected)}>null</span>);
@@ -74,6 +73,10 @@ class JsonEditor extends React.Component<{ jsonData: Json, jsonPath: JsonPath },
       this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: down(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
     else if (event.key === "ArrowUp")
       this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: up(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+    else if (event.key === "Enter") 
+      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: enter(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+    else if (event.key === "Escape") 
+      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: leave(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
     else if (event.key === "n")
       this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, null), jsonPath: prevState.jsonPath }))
     else if (event.key === "t")

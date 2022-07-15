@@ -1,10 +1,10 @@
 import App from "./App";
-import { arrayPath, objectPath } from "./domain";
-import { down, up } from "./navigation";
+import { arrayPath, Json, JsonPath, objectPath } from "./domain";
+import { down, enter, up } from "./navigation";
 
 describe('down', () => {
 
-    
+
     describe('array', () => {
         test('single element at end goes nowhere', () => {
             expect(down([0], arrayPath(0))).toStrictEqual(null);
@@ -20,16 +20,16 @@ describe('down', () => {
 
     describe('object', () => {
         test('single element at end goes nowhere', () => {
-            expect(down({"hello" : "world"}, objectPath(0, "key"))).toStrictEqual(null);
-            expect(down({"hello" : "world"}, objectPath(0, "value"))).toStrictEqual(null);
+            expect(down({ "hello": "world" }, objectPath(0))).toStrictEqual(null);
+            expect(down({ "hello": "world" }, objectPath(0))).toStrictEqual(null);
         })
         test('end of object goes nowhere', () => {
-            expect(down({"foo": "bar", "hello" : "world"}, objectPath(1, "key"))).toStrictEqual(null);
-            expect(down({"foo": "bar", "hello" : "world"}, objectPath(1, "value"))).toStrictEqual(null);
+            expect(down({ "foo": "bar", "hello": "world" }, objectPath(1))).toStrictEqual(null);
+            expect(down({ "foo": "bar", "hello": "world" }, objectPath(1))).toStrictEqual(null);
         })
         test('not end of array goes to next element', () => {
-            expect(down({"foo": "bar", "hello" : "world"}, objectPath(0, "key"))).toStrictEqual(objectPath(1, "key"));
-            expect(down({"foo": "bar", "hello" : "world"}, objectPath(0, "value"))).toStrictEqual(objectPath(1, "value"));
+            expect(down({ "foo": "bar", "hello": "world" }, objectPath(0))).toStrictEqual(objectPath(1));
+            expect(down({ "foo": "bar", "hello": "world" }, objectPath(0))).toStrictEqual(objectPath(1));
         })
     })
 })
@@ -50,17 +50,16 @@ describe('up', () => {
 
     describe('object', () => {
         test('single element at beginning goes nowhere', () => {
-            expect(up({"hello" : "world"}, objectPath(0, "key"))).toStrictEqual(null);
-            expect(up({"hello" : "world"}, objectPath(0, "value"))).toStrictEqual(null);
+            expect(up({ "hello": "world" }, objectPath(0))).toStrictEqual(null);
+            expect(up({ "hello": "world" }, objectPath(0))).toStrictEqual(null);
         })
         test('beginning of object goes nowhere', () => {
-            expect(up({"foo": "bar", "hello" : "world"}, objectPath(0, "key"))).toStrictEqual(null);
-            expect(up({"foo": "bar", "hello" : "world"}, objectPath(0, "value"))).toStrictEqual(null);
+            expect(up({ "foo": "bar", "hello": "world" }, objectPath(0))).toStrictEqual(null);
+            expect(up({ "foo": "bar", "hello": "world" }, objectPath(0))).toStrictEqual(null);
         })
         test('not beggining of array goes to previous element', () => {
-            expect(up({"foo": "bar", "hello" : "world"}, objectPath(1, "key"))).toStrictEqual(objectPath(0, "key"));
-            expect(up({"foo": "bar", "hello" : "world"}, objectPath(1, "value"))).toStrictEqual(objectPath(0, "value"));
+            expect(up({ "foo": "bar", "hello": "world" }, objectPath(1))).toStrictEqual(objectPath(0));
+            expect(up({ "foo": "bar", "hello": "world" }, objectPath(1))).toStrictEqual(objectPath(0));
         })
     })
 })
-

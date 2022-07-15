@@ -22,11 +22,8 @@ function replace(existing: Json, path: JsonPath, updated_value: Json): Json {
                 pairs[path.position] = [existingInner[0], newInner]
                 return Object.fromEntries(pairs);
             } else {
-                console.log("HERE");
                 const pairs = Object.entries(existing as { [key: string]: Json })
-                console.log(`PAIRS: ${JSON.stringify(pairs)}`)
                 const existingInner = pairs[path.position]
-                console.log(`EXISTING INNERS: ${JSON.stringify(existingInner)}`)
 
                 pairs[path.position] = [existingInner[0], updated_value]
                 return Object.fromEntries(pairs);

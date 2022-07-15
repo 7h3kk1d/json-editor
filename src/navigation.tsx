@@ -1,6 +1,4 @@
 
-import { getDefaultLibFilePath } from "typescript";
-import { pathToFileURL } from "url";
 import { arrayPath, Json, JsonPath, objectPath } from "./domain";
 // Explore different type of tree walks/navigation operations
 

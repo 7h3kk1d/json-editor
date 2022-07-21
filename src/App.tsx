@@ -2,7 +2,7 @@ import * as React from 'react'
 import { ReactElement } from 'react'
 import './App.css'
 import { Json, JsonArrayPos, JsonObjectLocation, JsonPath, objectPath } from './domain';
-import { replace } from './modification';
+import { insert, remove, replace } from './modification';
 import { down, enter, leave, up } from './navigation';
 
 function optionallySelectedClassName(className: string, selected: boolean) {
@@ -89,6 +89,11 @@ class JsonEditor extends React.Component<{ jsonData: Json, jsonPath: JsonPath },
       this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, []), jsonPath: prevState.jsonPath }))
     else if (event.key === "\"")
       this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, ""), jsonPath: prevState.jsonPath }))
+    else if (event.key === ",")
+      this.setState(prevState => ({ jsonData: insert(prevState.jsonData, prevState.jsonPath), jsonPath: prevState.jsonPath }))
+    else if (event.key === "Delete")
+      this.setState(prevState => ({ jsonData: remove(prevState.jsonData, prevState.jsonPath), jsonPath: prevState.jsonPath }))
+
   }
 
   componentDidMount() {

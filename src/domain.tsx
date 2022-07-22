@@ -85,5 +85,5 @@ function objectPath(n: number, inner?: JsonPath) : JsonObjectLocation {
           }
 }
 
-export type {Json, JsonArrayPos, JsonObjectLocation, JsonPath}
-export {objectPath, arrayPath}
+export type {Json, Json2, JsonArrayPos, JsonObjectLocation, JsonPath}
+export {objectPath, arrayPath, parse}

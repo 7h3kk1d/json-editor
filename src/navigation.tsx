@@ -1,28 +1,13 @@
 
-import { arrayPath, Json, JsonPath, objectPath } from "./domain";
+import { arrayPath, Json2, JsonArray, JsonObject, JsonPath, objectPath } from "./domain";
 // Explore different type of tree walks/navigation operations
 
-function fetch(data: Json, path: JsonPath[]): Json | null {
-  if (path.length === 0)
-    return data;
 
-  const head: JsonPath = path[0];
-  if (head.type === "JsonArrayPos") {
-    const array: Json[] = data as any;
-    return fetch(array[head.position], path.slice(1, path.length));
-  } else if (head.type === "JsonObjectLocation") {
-    const obj: { [key: string]: Json } = data as any;
-    return fetch(Object.entries(obj)[head.position][1], path.slice(1, path.length));
-  } else {
-    return data;
-  }
-}
-
-// TODO: Can I use conditional types to enforce that path and data are coherent
-function down(data: Json, path: JsonPath): JsonPath | null {
-  switch (path.type) {
-    case "JsonArrayPos":
-      const data2 = data as Json[]
+// TODO: Can I use conditional types to enforce that path and data are coherent? Or more realistically move the focus onto the Json type
+function down(data: Json2, path: JsonPath): JsonPath | null {
+  switch (data.kind) {
+    case "array":
+      const data2 = data.value
       if (path.inner) {
         const innerPath = down(data2[path.position], path.inner)
         if (innerPath)
@@ -35,31 +20,32 @@ function down(data: Json, path: JsonPath): JsonPath | null {
         return null;
       }
 
-    case "JsonObjectLocation":
-      const objectData = data as { [key: string]: Json }
-      const objectEntries = Object.entries(objectData)
+    case "object":
+      const objectData = data as JsonObject
+      const objectEntries = data.value
       if (path.inner) {
-        const innerPath = down(objectEntries[path.position][1], path.inner)
+        const innerPath = down(objectEntries[path.position].value, path.inner)
 
         if (innerPath)
           return objectPath(path.position, innerPath)
       }
 
-      if (Object.entries(objectData).length > (path.position + 1)) {
+      if (objectData.value.length > (path.position + 1)) {
         return objectPath(path.position + 1)
       } else {
         return null;
       }
-
+    default:
+      return null
   }
 }
 
-function up(data: Json, path: JsonPath): JsonPath | null {
-  switch (path.type) {
-    case "JsonArrayPos":
-      const arrayData = data as Json[]
+
+function up(data: Json2, path: JsonPath): JsonPath | null {
+  switch (data.kind) {
+    case "array":
       if (path.inner) {
-        const innerPath = up(arrayData[path.position], path.inner)
+        const innerPath = up(data.value[path.position], path.inner)
         if (innerPath)
           return arrayPath(path.position, innerPath)
       }
@@ -69,11 +55,9 @@ function up(data: Json, path: JsonPath): JsonPath | null {
       } else {
         return null;
       }
-    case "JsonObjectLocation":
-      const objData = data as { [key: string]: Json }
-      const objEntries = Object.entries(objData)
+    case "object":
       if (path.inner) {
-        const innerPath = up(objEntries[path.position], path.inner)
+        const innerPath = up(data.value[path.position].value, path.inner)
         if (innerPath)
           return objectPath(path.position, innerPath)
       }
@@ -83,48 +67,53 @@ function up(data: Json, path: JsonPath): JsonPath | null {
       } else {
         return null;
       }
+    default: 
+      return null
   }
 }
 
-function defaultPath(data: Json): JsonPath | undefined {
-  if (Array.isArray(data) && data.length > 0)
-    return arrayPath(0)
-  if (typeof (data) === 'object')
-    if (Object.keys(data as object).length > 0)
-      return objectPath(0)
+function defaultPath(data: Json2): JsonPath | undefined {
+  switch(data.kind) {
+    case "array":
+      if(data.value.length > 0)
+        return arrayPath(0)
+      break
+    case "object":
+      if(data.value.length > 0)
+        return objectPath(0)
+  }
 }
 
 // Move focus into the path your currently observing
-function enter(data: Json, path: JsonPath): JsonPath | undefined {
+function enter(data: Json2, path: JsonPath): JsonPath | undefined {
   switch (path.type) {
     case "JsonArrayPos":
-      const dataArray = data as Json[]
+      const dataArray = data as JsonArray
 
       if (path.inner) {
-        const innerPath = enter(dataArray[path.position], path.inner)
+        const innerPath = enter(dataArray.value[path.position], path.inner)
         return innerPath ? arrayPath(path.position, innerPath) : undefined
       } else {
-        const innerPath = defaultPath(dataArray[path.position])
+        const innerPath = defaultPath(dataArray.value[path.position])
         return innerPath ? arrayPath(path.position, innerPath) : undefined
       }
     
     case "JsonObjectLocation":
-      const objData = data as { [key: string]: Json }
-      const objEntries = Object.entries(objData)
+      const objData = data as JsonObject
+      const objEntries = objData.value
 
       if(path.inner) {
-        const innerPath = enter(objEntries[path.position][1], path.inner)
+        const innerPath = enter(objEntries[path.position].value, path.inner)
 
         return innerPath ? objectPath(path.position, innerPath) : undefined
       } else {
-        const innerPath = defaultPath(objEntries[path.position][1])
+        const innerPath = defaultPath(objEntries[path.position].value)
         return innerPath ? objectPath(path.position, innerPath) : undefined
-
       }
   }
 }
 
-function leave(data: Json, path: JsonPath): JsonPath | undefined {
+function leave(data: Json2, path: JsonPath): JsonPath | undefined {
   const pathClone = JSON.parse(JSON.stringify(path)) as JsonPath
   if(!path.inner)
     return undefined
@@ -134,5 +123,5 @@ function leave(data: Json, path: JsonPath): JsonPath | undefined {
 }
 
 
-export { down, fetch, up, enter, leave };
+export { down, up, enter, leave };
 

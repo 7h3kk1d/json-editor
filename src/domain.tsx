@@ -1,14 +1,12 @@
-type Json = number | string | boolean | null | { [key: string]: Json } | Json[]
-
 type JsonNumber = { kind: "number"; value: number; }
 type JsonString = { kind: "string"; value: string; }
 type JsonBoolean = { kind: "boolean"; value: boolean; }
 type JsonNull = {kind: "null"; }
-type JsonArray = {kind: "array"; value: Json2[]; }
-type JsonObject = {kind: "object"; value: {"key": string, "value": Json2}[];}
+type JsonArray = {kind: "array"; value: Json[]; }
+type JsonObject = {kind: "object"; value: {"key": string, "value": Json}[];}
 
 
-type Json2 = JsonNumber | JsonString | JsonBoolean | JsonNull | JsonObject | JsonArray
+type Json = JsonNumber | JsonString | JsonBoolean | JsonNull | JsonObject | JsonArray
 
 
 function  jsonNull() : JsonNull {
@@ -23,14 +21,14 @@ function jsonBoolean(value: boolean) : JsonBoolean {
 function jsonNumber(value: number) : JsonNumber {
   return {kind: "number", value};
 }
-function jsonArray(value: Json2[]) : JsonArray {
+function jsonArray(value: Json[]) : JsonArray {
   return {kind: "array", value};
 }
-function jsonObject(value: {"key": string, "value": Json2}[]) : JsonObject {
+function jsonObject(value: {"key": string, "value": Json}[]) : JsonObject {
   return {kind: "object", value: value}
 }
 
-function parse(json: any) : Json2 {
+function parse(json: any) : Json {
   if (json == null) {
     return jsonNull();
   } else if (typeof (json) == "string") {
@@ -85,5 +83,6 @@ function objectPath(n: number, inner?: JsonPath) : JsonObjectLocation {
           }
 }
 
-export type {Json2, JsonArrayPos, JsonObjectLocation, JsonPath, JsonObject, JsonArray}
+
+export type {Json, JsonArrayPos, JsonObjectLocation, JsonPath, JsonObject, JsonArray}
 export {objectPath, arrayPath, parse, jsonObject, jsonArray, jsonNull, jsonNumber, jsonBoolean, jsonString}

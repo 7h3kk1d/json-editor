@@ -1,10 +1,11 @@
 
-import { arrayPath, Json2, JsonArray, JsonObject, JsonPath, objectPath } from "./domain";
+import { arrayPath, Json, JsonArray, JsonObject, JsonPath, objectPath } from "./domain";
 // Explore different type of tree walks/navigation operations
 
 
+
 // TODO: Can I use conditional types to enforce that path and data are coherent? Or more realistically move the focus onto the Json type
-function down(data: Json2, path: JsonPath): JsonPath | null {
+function down(data: Json, path: JsonPath): JsonPath | null {
   switch (data.kind) {
     case "array":
       const data2 = data.value
@@ -41,7 +42,7 @@ function down(data: Json2, path: JsonPath): JsonPath | null {
 }
 
 
-function up(data: Json2, path: JsonPath): JsonPath | null {
+function up(data: Json, path: JsonPath): JsonPath | null {
   switch (data.kind) {
     case "array":
       if (path.inner) {
@@ -72,7 +73,7 @@ function up(data: Json2, path: JsonPath): JsonPath | null {
   }
 }
 
-function defaultPath(data: Json2): JsonPath | undefined {
+function defaultPath(data: Json): JsonPath | undefined {
   switch(data.kind) {
     case "array":
       if(data.value.length > 0)
@@ -85,7 +86,7 @@ function defaultPath(data: Json2): JsonPath | undefined {
 }
 
 // Move focus into the path your currently observing
-function enter(data: Json2, path: JsonPath): JsonPath | undefined {
+function enter(data: Json, path: JsonPath): JsonPath | undefined {
   switch (path.type) {
     case "JsonArrayPos":
       const dataArray = data as JsonArray
@@ -113,7 +114,7 @@ function enter(data: Json2, path: JsonPath): JsonPath | undefined {
   }
 }
 
-function leave(data: Json2, path: JsonPath): JsonPath | undefined {
+function leave(data: Json, path: JsonPath): JsonPath | undefined {
   const pathClone = JSON.parse(JSON.stringify(path)) as JsonPath
   if(!path.inner)
     return undefined

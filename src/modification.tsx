@@ -1,6 +1,6 @@
-import { Json2, jsonArray, JsonArray, jsonNull, jsonObject, JsonObject, JsonPath } from "./domain";
+import { Json, jsonArray, JsonArray, jsonNull, jsonObject, JsonObject, JsonPath } from "./domain";
 
-function replace(existing: Json2, path: JsonPath, updated_value: Json2): Json2 {
+function replace(existing: Json, path: JsonPath, updated_value: Json): Json {
     const clone = JSON.parse(JSON.stringify(existing)) // I need an actual data structure representation
 
     switch (path.type) {
@@ -31,7 +31,7 @@ function replace(existing: Json2, path: JsonPath, updated_value: Json2): Json2 {
     }
 }
 
-function insert(existing: Json2, path: JsonPath): Json2 {
+function insert(existing: Json, path: JsonPath): Json {
     const clone = JSON.parse(JSON.stringify(existing)) 
 
     switch (path.type) {
@@ -59,7 +59,7 @@ function insert(existing: Json2, path: JsonPath): Json2 {
         }
 }
 
-function remove(existing: Json2, path: JsonPath): Json2 {
+function remove(existing: Json, path: JsonPath): Json {
     const clone = JSON.parse(JSON.stringify(existing)) 
 
     switch (path.type) {

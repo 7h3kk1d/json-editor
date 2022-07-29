@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import './App.css'
-import { Json2, jsonArray, JsonArrayPos, jsonBoolean, jsonNull, jsonObject, JsonObjectLocation, JsonPath, jsonString, objectPath, parse } from './domain';
+import { Json, jsonArray, JsonArrayPos, jsonBoolean, jsonNull, jsonObject, JsonObjectLocation, JsonPath, jsonString, objectPath, parse } from './domain';
 import { insert, remove, replace } from './modification';
 import { down, enter, leave, up } from './navigation';
 
@@ -9,7 +9,7 @@ function optionallySelectedClassName(className: string, selected: boolean) {
   return className + (selected ? " selected" : "")
 }
 
-function render(data: Json2, path?: JsonPath, selected: boolean = false): ReactElement {
+function render(data: Json, path?: JsonPath, selected: boolean = false): ReactElement {
   const pathHead = path;
   if (data.kind == "null") {
     return (<span className={optionallySelectedClassName("null", selected)}>null</span>);
@@ -61,8 +61,8 @@ function render(data: Json2, path?: JsonPath, selected: boolean = false): ReactE
 }
 
 
-class JsonEditor extends React.Component<{ jsonData: Json2, jsonPath: JsonPath }, { jsonData: Json2, jsonPath: JsonPath }> {
-  constructor(props: { jsonData: Json2, jsonPath: JsonPath }) {
+class JsonEditor extends React.Component<{ jsonData: Json, jsonPath: JsonPath }, { jsonData: Json, jsonPath: JsonPath }> {
+  constructor(props: { jsonData: Json, jsonPath: JsonPath }) {
     super(props);
     this.state = { jsonData: props.jsonData, jsonPath: props.jsonPath };
     this.handleKey = this.handleKey.bind(this);

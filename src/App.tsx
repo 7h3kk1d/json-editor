@@ -11,15 +11,15 @@ function optionallySelectedClassName(className: string, selected: boolean) {
 
 function render(data: Json, path?: JsonPath, selected: boolean = false): ReactElement {
   const pathHead = path;
-  if (data.kind == "null") {
+  if (data.kind === "null") {
     return (<span className={optionallySelectedClassName("null", selected)}>null</span>);
-  } else if (data.kind == "string") {
+  } else if (data.kind === "string") {
     return <span className={optionallySelectedClassName("string", selected)}>"{data.value}"</span>;
-  } else if (data.kind == "boolean") {
+  } else if (data.kind === "boolean") {
     return <span className={optionallySelectedClassName("boolean", selected)}>{data.value.toString()}</span>;
-  } else if (data.kind == "number") {
+  } else if (data.kind === "number") {
     return <span className={optionallySelectedClassName("num", selected)}>{data.value}</span>;
-  } else if (data.kind == "array") {
+  } else if (data.kind === "array") {
     const arrayPath = path as JsonArrayPos | undefined
     const pathPosition = arrayPath ? arrayPath.position : -1
     const inner: JsonPath | undefined = arrayPath?.inner

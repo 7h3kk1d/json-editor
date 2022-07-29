@@ -15,7 +15,7 @@ function  jsonNull() : JsonNull {
   return {kind: "null"} 
 }
 function jsonString(value: string) : JsonString{
-  return {kind: "string", value: "string"}
+  return {kind: "string", value: ""}
 }
 function jsonBoolean(value: boolean) : JsonBoolean {
   return {kind: "boolean", value};
@@ -30,7 +30,7 @@ function jsonObject(value: {"key": string, "value": Json2}[]) : JsonObject {
   return {kind: "object", value: value}
 }
 
-function parse(json: Json) : Json2 {
+function parse(json: any) : Json2 {
   if (json == null) {
     return jsonNull();
   } else if (typeof (json) == "string") {
@@ -42,7 +42,7 @@ function parse(json: Json) : Json2 {
   } else if (Array.isArray(json)) {
     return jsonArray(json.map(parse))
   } else {
-    return jsonObject(Object.entries(json as object).map(kv => ({ key: kv[0], value: kv[1] })))
+    return jsonObject(Object.entries(json as object).map(kv => ({ key: kv[0], value: parse(kv[1]) })))
   }
 }
 /* Alternative Approaches:
@@ -85,5 +85,5 @@ function objectPath(n: number, inner?: JsonPath) : JsonObjectLocation {
           }
 }
 
-export type {Json, Json2, JsonArrayPos, JsonObjectLocation, JsonPath}
-export {objectPath, arrayPath, parse}
+export type {Json2, JsonArrayPos, JsonObjectLocation, JsonPath, JsonObject, JsonArray}
+export {objectPath, arrayPath, parse, jsonObject, jsonArray, jsonNull, jsonNumber, jsonBoolean, jsonString}

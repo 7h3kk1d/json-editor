@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import './App.css'
-import { Json, Json2, JsonArrayPos, JsonObjectLocation, JsonPath, objectPath, parse } from './domain';
+import { Json2, jsonArray, JsonArrayPos, jsonBoolean, jsonNull, jsonObject, JsonObjectLocation, JsonPath, jsonString, objectPath, parse } from './domain';
 import { insert, remove, replace } from './modification';
 import { down, enter, leave, up } from './navigation';
 
@@ -71,28 +71,28 @@ class JsonEditor extends React.Component<{ jsonData: Json2, jsonPath: JsonPath }
   handleKey(event: KeyboardEvent) {
     if (event.key === "ArrowDown")
       this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: down(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
-    // else if (event.key === "ArrowUp")
-    //   this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: up(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
-    // else if (event.key === "Enter") 
-    //   this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: enter(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
-    // else if (event.key === "Escape") 
-    //   this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: leave(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
-    // else if (event.key === "n")
-    //   this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, null), jsonPath: prevState.jsonPath }))
-    // else if (event.key === "t")
-    //   this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, true), jsonPath: prevState.jsonPath }))
-    // else if (event.key === "f")
-    //   this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, false), jsonPath: prevState.jsonPath }))
-    // else if (event.key === "{")
-    //   this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, {}), jsonPath: prevState.jsonPath }))
-    // else if (event.key === "[")
-    //   this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, []), jsonPath: prevState.jsonPath }))
-    // else if (event.key === "\"")
-    //   this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, ""), jsonPath: prevState.jsonPath }))
-    // else if (event.key === ",")
-    //   this.setState(prevState => ({ jsonData: insert(prevState.jsonData, prevState.jsonPath), jsonPath: prevState.jsonPath }))
-    // else if (event.key === "Delete")
-    //   this.setState(prevState => ({ jsonData: remove(prevState.jsonData, prevState.jsonPath), jsonPath: prevState.jsonPath }))
+    else if (event.key === "ArrowUp")
+      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: up(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+    else if (event.key === "Enter") 
+      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: enter(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+    else if (event.key === "Escape") 
+      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: leave(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+    else if (event.key === "n")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, jsonNull()), jsonPath: prevState.jsonPath }))
+    else if (event.key === "t")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, jsonBoolean(true)), jsonPath: prevState.jsonPath }))
+    else if (event.key === "f")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, jsonBoolean(false)), jsonPath: prevState.jsonPath }))
+    else if (event.key === "{")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, jsonObject([])), jsonPath: prevState.jsonPath }))
+    else if (event.key === "[")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, jsonArray([])), jsonPath: prevState.jsonPath }))
+    else if (event.key === "\"")
+      this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, jsonString("")), jsonPath: prevState.jsonPath }))
+    else if (event.key === ",")
+      this.setState(prevState => ({ jsonData: insert(prevState.jsonData, prevState.jsonPath), jsonPath: prevState.jsonPath }))
+    else if (event.key === "Delete")
+      this.setState(prevState => ({ jsonData: remove(prevState.jsonData, prevState.jsonPath), jsonPath: prevState.jsonPath }))
 
   }
 
@@ -107,7 +107,7 @@ class JsonEditor extends React.Component<{ jsonData: Json2, jsonPath: JsonPath }
 
 
 export default function App() {
-  const current: Json = {
+  const current = {
     "Hello": "World",
     "empty": null,
     "truthy": true,
@@ -115,7 +115,7 @@ export default function App() {
     "listy": [1, 2, 3, [4, 5, 6]],
     "associate": { "bad_num": 10.3 }
   };
-  let path: JsonObjectLocation = objectPath(0);
+  let path: JsonPath = objectPath(0);
 
 
   return (

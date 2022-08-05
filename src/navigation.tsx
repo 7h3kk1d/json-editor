@@ -1,122 +1,119 @@
 
-import { arrayPath, Json, JsonArray, JsonObject, JsonPath, objectPath } from "./domain";
+import { arrayPath, Json, JsonObject, JsonPath, objectPath } from "./domain";
 // Explore different type of tree walks/navigation operations
 
-
-
-// TODO: Can I use conditional types to enforce that path and data are coherent? Or more realistically move the focus onto the Json type
-function down(data: Json, path: JsonPath): JsonPath | null {
+function recurse(data: Json, path: JsonPath, fn: (innerData: Json, innerPath: JsonPath) => JsonPath | null): JsonPath | null {
   switch (data.kind) {
     case "array":
       const data2 = data.value
       if (path.inner) {
-        const innerPath = down(data2[path.position], path.inner)
+        const innerPath = recurse(data2[path.position], path.inner, fn)
         if (innerPath)
           return arrayPath(path.position, innerPath)
       }
 
-      if (data2.length > (path.position + 1)) {
-        return arrayPath(path.position + 1)
-      } else {
-        return null;
-      }
-
+      return fn(data, path)
     case "object":
-      const objectData = data as JsonObject
       const objectEntries = data.value
       if (path.inner) {
-        const innerPath = down(objectEntries[path.position].value, path.inner)
+        const innerPath = recurse(objectEntries[path.position].value, path.inner, fn)
 
         if (innerPath)
           return objectPath(path.position, innerPath)
       }
 
-      if (objectData.value.length > (path.position + 1)) {
-        return objectPath(path.position + 1)
-      } else {
-        return null;
-      }
+      return fn(data, path)
     default:
       return null
   }
 }
 
 
+// TODO: Can I use conditional types to enforce that path and data are coherent? Or more realistically move the focus onto the Json type
+function down(data: Json, path: JsonPath): JsonPath | null {
+  return recurse(data, path, (innerData, innerPath) => {
+    switch (innerData.kind) {
+      case "array":
+        const data2 = innerData.value
+        if (data2.length > (innerPath.position + 1)) {
+          return arrayPath(innerPath.position + 1)
+        } else {
+          return null;
+        }
+
+      case "object":
+        const objectData = innerData as JsonObject
+        if (objectData.value.length > (innerPath.position + 1)) {
+          return objectPath(innerPath.position + 1)
+        } else {
+          return null;
+        }
+      default:
+        return null
+    }
+  })
+}
+
+
 function up(data: Json, path: JsonPath): JsonPath | null {
+  return recurse(data, path, (innerData, innerPath) => {
+    switch (innerData.kind) {
+      case "array":
+        if (innerPath.position > 0) {
+          return arrayPath(innerPath.position - 1)
+        } else {
+          return null;
+        }
+      case "object":
+        if (innerPath.position > 0) {
+          return objectPath(innerPath.position - 1)
+        } else {
+          return null;
+        }
+      default:
+        return null
+    }
+  })
+
+}
+
+function defaultPath(data: Json): JsonPath | null {
   switch (data.kind) {
     case "array":
-      if (path.inner) {
-        const innerPath = up(data.value[path.position], path.inner)
-        if (innerPath)
-          return arrayPath(path.position, innerPath)
-      }
-
-      if (path.position > 0) {
-        return arrayPath(path.position - 1)
-      } else {
-        return null;
-      }
+      if (data.value.length > 0)
+        return arrayPath(0)
+      return null
     case "object":
-      if (path.inner) {
-        const innerPath = up(data.value[path.position].value, path.inner)
-        if (innerPath)
-          return objectPath(path.position, innerPath)
-      }
-
-      if (path.position > 0) {
-        return objectPath(path.position - 1)
-      } else {
-        return null;
-      }
-    default: 
+      if (data.value.length > 0)
+        return objectPath(0)
+      return null
+    default:
       return null
   }
 }
 
-function defaultPath(data: Json): JsonPath | undefined {
-  switch(data.kind) {
-    case "array":
-      if(data.value.length > 0)
-        return arrayPath(0)
-      break
-    case "object":
-      if(data.value.length > 0)
-        return objectPath(0)
-  }
+function enter(data: Json, path: JsonPath): JsonPath | null {
+  return recurse(data, path, (innerData, innerPath) => {
+    switch (innerData.kind) {
+      case "array":
+        const insidePath = defaultPath(innerData.value[innerPath.position])
+        return insidePath ? arrayPath(innerPath.position, insidePath) : null
+      case "object":
+        const objData = data as JsonObject
+        const objEntries = objData.value
+
+        const insidePath2 = defaultPath(objEntries[innerPath.position].value)
+        return insidePath2 ? objectPath(innerPath.position, insidePath2) : null
+      default:
+        return null
+    }
+  })
 }
 
-// Move focus into the path your currently observing
-function enter(data: Json, path: JsonPath): JsonPath | undefined {
-  switch (path.type) {
-    case "JsonArrayPos":
-      const dataArray = data as JsonArray
-
-      if (path.inner) {
-        const innerPath = enter(dataArray.value[path.position], path.inner)
-        return innerPath ? arrayPath(path.position, innerPath) : undefined
-      } else {
-        const innerPath = defaultPath(dataArray.value[path.position])
-        return innerPath ? arrayPath(path.position, innerPath) : undefined
-      }
-    
-    case "JsonObjectLocation":
-      const objData = data as JsonObject
-      const objEntries = objData.value
-
-      if(path.inner) {
-        const innerPath = enter(objEntries[path.position].value, path.inner)
-
-        return innerPath ? objectPath(path.position, innerPath) : undefined
-      } else {
-        const innerPath = defaultPath(objEntries[path.position].value)
-        return innerPath ? objectPath(path.position, innerPath) : undefined
-      }
-  }
-}
 
 function leave(data: Json, path: JsonPath): JsonPath | undefined {
   const pathClone = JSON.parse(JSON.stringify(path)) as JsonPath
-  if(!path.inner)
+  if (!path.inner)
     return undefined
   const innerPath = leave(data, path.inner)
   pathClone.inner = innerPath

@@ -37,23 +37,23 @@ function insert(existing: Json, path: JsonPath): Json {
     switch (path.type) {
         case "JsonArrayPos":
             if (path.inner) {
-                const existingInner = (existing as JsonArray).value[path.position]
+                const existingInner = (clone as JsonArray).value[path.position]
                 const newInner = insert(existingInner, path.inner)
-                clone[path.position] = newInner
+                clone.value[path.position] = newInner
                 return clone;
             } else {
-                const array = (existing as JsonArray).value
+                const array = (clone as JsonArray).value
                 return jsonArray(array.slice(0, path.position+1).concat([jsonNull()]).concat(array.slice(path.position+1)));
             }
         case "JsonObjectLocation":
             if (path.inner) {
-                const pairs = (existing as JsonObject).value
+                const pairs = (clone as JsonObject).value
                 const existingInner = pairs[path.position]
                 const newInner = insert(existingInner.value, path.inner)
                 pairs[path.position] = {key: existingInner.key, value: newInner}
                 return jsonObject(pairs);
             } else {
-                const pairs = (existing as JsonObject).value
+                const pairs = (clone as JsonObject).value
                 return jsonObject(pairs.slice(0, path.position+1).concat({key: "", value: jsonNull()}).concat(pairs.slice(path.position+1)));
             }    
         }
@@ -65,23 +65,23 @@ function remove(existing: Json, path: JsonPath): Json {
     switch (path.type) {
         case "JsonArrayPos":
             if (path.inner) {
-                const existingInner = (existing as JsonArray).value[path.position]
+                const existingInner = (clone as JsonArray).value[path.position]
                 const newInner = remove(existingInner, path.inner)
-                clone[path.position] = newInner
+                clone.value[path.position] = newInner
                 return clone;
             } else {
-                const array = (existing as JsonArray).value
+                const array = (clone as JsonArray).value
                 return jsonArray(array.slice(0, path.position).concat(array.slice(path.position+1)));
             }
         case "JsonObjectLocation":
             if (path.inner) {
-                const pairs = (existing as JsonObject).value
+                const pairs = (clone as JsonObject).value
                 const existingInner = pairs[path.position]
                 const newInner = remove(existingInner.value, path.inner)
                 pairs[path.position] = {key: existingInner.key, value: newInner}
                 return jsonObject(pairs);
             } else {
-                const pairs = (existing as JsonObject).value
+                const pairs = (clone as JsonObject).value
                 return jsonObject(pairs.slice(0, path.position).concat(pairs.slice(path.position+1)));
             }    
         }

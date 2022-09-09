@@ -1,31 +1,31 @@
-type JsonNumber = { kind: "number"; value: number; }
-type JsonString = { kind: "string"; value: string; }
-type JsonBoolean = { kind: "boolean"; value: boolean; }
-type JsonNull = {kind: "null"; }
-type JsonArray = {kind: "array"; value: Json[]; }
-type JsonObject = {kind: "object"; value: {"key": string, "value": Json}[];}
+type JsonNumber = { kind: "number"; value: number; selected: boolean }
+type JsonString = { kind: "string"; value: string; selected: boolean }
+type JsonBoolean = { kind: "boolean"; value: boolean; selected: boolean }
+type JsonNull = {kind: "null"; selected: boolean }
+type JsonArray = {kind: "array"; value: Json[]; selected: boolean}
+type JsonObject = {kind: "object"; value: {"key": string, "value": Json}[]; selected: boolean}
 
 
 type Json = JsonNumber | JsonString | JsonBoolean | JsonNull | JsonObject | JsonArray
 
 
-function  jsonNull() : JsonNull {
-  return {kind: "null"} 
+function  jsonNull(selected=false) : JsonNull {
+  return {kind: "null", selected} 
 }
-function jsonString(value: string) : JsonString{
-  return {kind: "string", value: ""}
+function jsonString(value: string, selected=false) : JsonString{
+  return {kind: "string", value, selected}
 }
-function jsonBoolean(value: boolean) : JsonBoolean {
-  return {kind: "boolean", value};
+function jsonBoolean(value: boolean, selected=false) : JsonBoolean {
+  return {kind: "boolean", value, selected};
 }
-function jsonNumber(value: number) : JsonNumber {
-  return {kind: "number", value};
+function jsonNumber(value: number, selected=false) : JsonNumber {
+  return {kind: "number", value, selected};
 }
-function jsonArray(value: Json[]) : JsonArray {
-  return {kind: "array", value};
+function jsonArray(value: Json[], selected=false) : JsonArray {
+  return {kind: "array", value, selected};
 }
-function jsonObject(value: {"key": string, "value": Json}[]) : JsonObject {
-  return {kind: "object", value: value}
+function jsonObject(value: {"key": string, "value": Json}[], selected=false) : JsonObject {
+  return {kind: "object", value: value, selected}
 }
 
 function parse(json: any) : Json {

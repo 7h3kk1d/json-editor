@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import './App.css'
-import { Json, jsonArray, JsonArrayPos, jsonBoolean, jsonNull, jsonObject, JsonObjectLocation, JsonPath, jsonString, objectPath, parse } from './domain';
+import { Json, JsonArray, jsonArray, JsonArrayPos, jsonBoolean, jsonNull, JsonObject, jsonObject, JsonObjectLocation, JsonPath, jsonString, objectPath, parse } from './domain';
 import { insert, remove, replace } from './modification';
 import { down, enter, leave, up } from './navigation';
 
@@ -9,8 +9,9 @@ function optionallySelectedClassName(className: string, selected: boolean) {
   return className + (selected ? " selected" : "")
 }
 
-function render(data: Json, path?: JsonPath, selected: boolean = false): ReactElement {
+function render(data: Json, path?: JsonPath): ReactElement {
   const pathHead = path;
+  const selected = data.selected
   if (data.kind === "null") {
     return (<span className={optionallySelectedClassName("null", selected)}>null</span>);
   } else if (data.kind === "string") {
@@ -25,7 +26,7 @@ function render(data: Json, path?: JsonPath, selected: boolean = false): ReactEl
     const inner: JsonPath | undefined = arrayPath?.inner
 
     const elems = data.value
-      .map((v, idx) => render(v, pathPosition === idx ? inner : undefined, false))
+      .map((v, idx) => render(v, pathPosition === idx ? inner : undefined))
       .map((v, idx) => idx === (data.value.length - 1) ? v : <>{v},</>)
       .map((v, idx) => <div className={optionallySelectedClassName("listEntry", pathPosition === idx && inner === undefined)}>{v}</div>)
     // I kind of wish we could select just the element text and not the comma with the whole list entry
@@ -46,7 +47,7 @@ function render(data: Json, path?: JsonPath, selected: boolean = false): ReactEl
 
     const elems = pairs
       .map(({key: k, value: v}, idx) => {
-        return (<div className={optionallySelectedClassName("objectEntry", pathPosition === idx && inner === undefined)}>"{k}": {render(v, pathPosition === idx ? inner : undefined, false)}{idx === (pairs.length - 1) ? "" : ","}</div>)
+        return (<div className={optionallySelectedClassName("objectEntry", false)}>"{k}": {render(v, pathPosition === idx ? inner : undefined)}{idx === (pairs.length - 1) ? "" : ","}</div>)
       })
 
     return (<span className={optionallySelectedClassName("object", selected)}>
@@ -70,13 +71,13 @@ class JsonEditor extends React.Component<{ jsonData: Json, jsonPath: JsonPath },
 
   handleKey(event: KeyboardEvent) {
     if (event.key === "ArrowDown")
-      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: down(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+      this.setState(prevState => ({ jsonData: down(prevState.jsonData) }));
     else if (event.key === "ArrowUp")
-      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: up(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+      this.setState(prevState => ({ jsonData: up(prevState.jsonData) }));
     else if (event.key === "Enter") 
-      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: enter(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+      this.setState(prevState => ({ jsonData: enter(prevState.jsonData) }));
     else if (event.key === "Escape") 
-      this.setState(prevState => ({ jsonData: prevState.jsonData, jsonPath: leave(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath }));
+      this.setState(prevState => ({ jsonData: leave(prevState.jsonData) }));
     else if (event.key === "n")
       this.setState(prevState => ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, jsonNull()), jsonPath: prevState.jsonPath }))
     else if (event.key === "t")
@@ -107,20 +108,21 @@ class JsonEditor extends React.Component<{ jsonData: Json, jsonPath: JsonPath },
 
 
 export default function App() {
-  const current = {
+  const current = parse({
     "Hello": "World",
     "empty": null,
     "truthy": true,
     "falsey": false,
     "listy": [1, 2, 3, [4, 5, 6]],
     "associate": { "bad_num": 10.3 }
-  };
+  }) as JsonObject;
+  (current.value[0].value as JsonArray).selected = true
   let path: JsonPath = objectPath(0);
 
 
   return (
     <main>
-      <JsonEditor jsonData={parse(current)} jsonPath={path} />
+      <JsonEditor jsonData={current} jsonPath={path} />
     </main>
   )
 }

@@ -13,7 +13,7 @@ function  jsonNull() : JsonNull {
   return {kind: "null"} 
 }
 function jsonString(value: string) : JsonString{
-  return {kind: "string", value: ""}
+  return {kind: "string", value: value}
 }
 function jsonBoolean(value: boolean) : JsonBoolean {
   return {kind: "boolean", value};
@@ -62,8 +62,10 @@ type JsonObjectLocation = {
   focus: "key" | "value"
   inner?: JsonPath
 }
-
-type JsonPath = JsonArrayPos | JsonObjectLocation
+type JsonStringPath = {
+  type: "JsonString"
+}
+type JsonPath = JsonArrayPos | JsonObjectLocation | JsonStringPath
 
 
 function arrayPath(n : number, inner?: JsonPath) : JsonArrayPos {

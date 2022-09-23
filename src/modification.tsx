@@ -14,25 +14,27 @@ function replace(existing: Json, path: JsonPath, updated_value: Json): Json {
                 clone.value[path.position] = updated_value
                 return clone
             }
-        case "JsonObjectLocation":    
+        case "JsonObjectLocation":
             if (path.inner) {
                 const pairs = (existing as JsonObject).value
                 const existingInner = pairs[path.position]
                 const newInner = replace(existingInner.value, path.inner, updated_value)
-                pairs[path.position] = {key: existingInner.key, value: newInner}
+                pairs[path.position] = { key: existingInner.key, value: newInner }
                 return jsonObject(pairs);
             } else {
                 const pairs = (existing as JsonObject).value
                 const existingInner = pairs[path.position]
 
-                pairs[path.position] = {key: existingInner.key, value: updated_value}
+                pairs[path.position] = { key: existingInner.key, value: updated_value }
                 return jsonObject(pairs);
             }
+            case "JsonString":
+                return updated_value
     }
 }
 
 function insert(existing: Json, path: JsonPath): Json {
-    const clone = JSON.parse(JSON.stringify(existing)) 
+    const clone = JSON.parse(JSON.stringify(existing))
 
     switch (path.type) {
         case "JsonArrayPos":
@@ -43,24 +45,26 @@ function insert(existing: Json, path: JsonPath): Json {
                 return clone;
             } else {
                 const array = (clone as JsonArray).value
-                return jsonArray(array.slice(0, path.position+1).concat([jsonNull()]).concat(array.slice(path.position+1)));
+                return jsonArray(array.slice(0, path.position + 1).concat([jsonNull()]).concat(array.slice(path.position + 1)));
             }
         case "JsonObjectLocation":
             if (path.inner) {
                 const pairs = (clone as JsonObject).value
                 const existingInner = pairs[path.position]
                 const newInner = insert(existingInner.value, path.inner)
-                pairs[path.position] = {key: existingInner.key, value: newInner}
+                pairs[path.position] = { key: existingInner.key, value: newInner }
                 return jsonObject(pairs);
             } else {
                 const pairs = (clone as JsonObject).value
-                return jsonObject(pairs.slice(0, path.position+1).concat({key: "", value: jsonNull()}).concat(pairs.slice(path.position+1)));
-            }    
-        }
+                return jsonObject(pairs.slice(0, path.position + 1).concat({ key: "", value: jsonNull() }).concat(pairs.slice(path.position + 1)));
+            }
+            case "JsonString":
+                return existing
+    }
 }
 
 function remove(existing: Json, path: JsonPath): Json {
-    const clone = JSON.parse(JSON.stringify(existing)) 
+    const clone = JSON.parse(JSON.stringify(existing))
 
     switch (path.type) {
         case "JsonArrayPos":
@@ -71,20 +75,22 @@ function remove(existing: Json, path: JsonPath): Json {
                 return clone;
             } else {
                 const array = (clone as JsonArray).value
-                return jsonArray(array.slice(0, path.position).concat(array.slice(path.position+1)));
+                return jsonArray(array.slice(0, path.position).concat(array.slice(path.position + 1)));
             }
         case "JsonObjectLocation":
             if (path.inner) {
                 const pairs = (clone as JsonObject).value
                 const existingInner = pairs[path.position]
                 const newInner = remove(existingInner.value, path.inner)
-                pairs[path.position] = {key: existingInner.key, value: newInner}
+                pairs[path.position] = { key: existingInner.key, value: newInner }
                 return jsonObject(pairs);
             } else {
                 const pairs = (clone as JsonObject).value
-                return jsonObject(pairs.slice(0, path.position).concat(pairs.slice(path.position+1)));
-            }    
-        }
+                return jsonObject(pairs.slice(0, path.position).concat(pairs.slice(path.position + 1)));
+            }
+        case "JsonString":
+            return existing
+    }
 }
 
 export { replace, insert, remove }

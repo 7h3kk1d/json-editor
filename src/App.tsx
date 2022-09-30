@@ -49,8 +49,8 @@ class JsonEditor extends React.Component<{ jsonData: Json, jsonPath: JsonPath },
     if (jsonStringPath(this.state.jsonPath)) {
       if (event.key === "Escape")
         this.setState(prevState => {
-          if (document.activeElement?.innerHTML) {
-            return ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, jsonString(document.activeElement?.innerHTML)), jsonPath: leave(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath });
+          if ((document.activeElement as HTMLTextAreaElement)?.value) {
+            return ({ jsonData: replace(prevState.jsonData, prevState.jsonPath, jsonString((document.activeElement as HTMLTextAreaElement)?.value)), jsonPath: leave(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath });
           }
           return ({ jsonData: prevState.jsonData, jsonPath: leave(prevState.jsonData, prevState.jsonPath) || prevState.jsonPath });
         });
@@ -95,13 +95,22 @@ class JsonEditor extends React.Component<{ jsonData: Json, jsonPath: JsonPath },
       return (<span className={optionallySelectedClassName("null", selected)}>null</span>);
     } else if (data.kind === "string") {
       if (path?.type === "JsonString") {
-        return <span className={optionallySelectedClassName("string", selected)}>"<span ref={input => {
+        return <span className={optionallySelectedClassName("string", selected)}>"<textarea onChange={event => {
+          let input = event?.target;
+          input.style.overflow = 'hidden';
+          input.style.height = "0";
+          input.style.height = input.scrollHeight + 'px';
+        }} ref={input => {
           if (!(document.activeElement === input)) {
             input && placeCaretAtEnd(input)
           }
-        }} contentEditable={true} >{data.value}</span>"</span>;
+          if(input) {
+            input.selectionStart=data.value.length;
+            input.selectionEnd=data.value.length;
+          }
+        }}>{data.value}</textarea>"</span>;
       } else {
-        return <span className={optionallySelectedClassName("string", selected)}>"{data.value}"</span>;
+        return <span className={optionallySelectedClassName("string", selected) + " display-linebreak"}>"{data.value}"</span>;
       }
     } else if (data.kind === "boolean") {
       return <span className={optionallySelectedClassName("boolean", selected)}>{data.value.toString()}</span>;
